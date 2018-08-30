@@ -1,7 +1,7 @@
 # Личный проект «Кэндишоп» [![Build status][travis-image]][travis-url]
 
 * Студент: [Женя Макарова](https://up.htmlacademy.ru/javascript/15/user/174755).
-* Наставник: `Неизвестно`.
+* Наставник: [Игорь Шевченко](https://htmlacademy.ru/profile/id149304).
 
 ---
 
