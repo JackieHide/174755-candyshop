@@ -128,7 +128,7 @@ var generateGoods = function (goodsLength) {
         value: generateRandomNumber(VALUE_MIN, VALUE_MAX),
         number: generateRandomNumber(NUMBER_MIN, NUMBER_MAX)
       },
-      ingredients: {
+      nutritionFacts: {
         sugar: Boolean(Math.round(Math.random())),
         energy: generateRandomNumber(ENERGY_MIN, ENERGY_MAX),
         contents: contentsString,
@@ -175,7 +175,7 @@ var renderGood = function (good) {
   var goodCardCharacteristic = goodCard.querySelector('.card__characteristic');
   var goodCardComposition = goodCard.querySelector('.card__composition-list');
   var goodCardPicture = goodCard.querySelector('.card__img');
-  var currentSugar = good.ingredients.sugar ? 'Содержит сахар' : 'Без сахара';
+  var currentSugar = good.nutritionFacts.sugar ? 'Содержит сахар' : 'Без сахара';
 
   goodCard.classList.remove('card--in-stock', 'card--little', 'card--soon');
 
@@ -195,8 +195,8 @@ var renderGood = function (good) {
   goodStarsRating.classList.add(getRatingClass(good.rating.value));
 
   goodStarCount.textContent = '(' + good.rating.number + ')';
-  goodCardCharacteristic.textContent = currentSugar + '. ' + good.ingredients.energy + ' ккал';
-  goodCardComposition.textContent = good.ingredients.contents;
+  goodCardCharacteristic.textContent = currentSugar + '. ' + good.nutritionFacts.energy + ' ккал';
+  goodCardComposition.textContent = good.nutritionFacts.contents;
   goodCardPicture.setAttribute('src', good.picture);
 
   return goodCard;
