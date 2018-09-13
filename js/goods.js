@@ -1,3 +1,5 @@
+'use strict';
+
 var FUNNY_NAMES = [
   'Чесночные сливки',
   'Огуречный педант',
@@ -137,8 +139,31 @@ var generateGoods = function (goodsLength) {
   return defaultGoods;
 };
 
-document.querySelector('.catalog__cards').classList.remove('catalog__cards--load');
-document.querySelector('.catalog__load').classList.add('visually-hidden');
+var getRatingClass = function (number) {
+  var elemClass;
+
+  switch (number) {
+    case 1:
+      elemClass = 'stars__rating--one';
+      break;
+    case 2:
+      elemClass = 'stars__rating--two';
+      break;
+    case 3:
+      elemClass = 'stars__rating--three';
+      break;
+    case 4:
+      elemClass = 'stars__rating--four';
+      break;
+    case 5:
+      elemClass = 'stars__rating--five';
+      break;
+    default:
+      break;
+  }
+
+  return elemClass;
+};
 
 var renderGood = function (good) {
   var goodTemplate = document.querySelector('#card').content.querySelector('.catalog__card');
@@ -154,38 +179,20 @@ var renderGood = function (good) {
 
   goodCard.classList.remove('card--in-stock', 'card--little', 'card--soon');
 
-  if (good.amount > 5 ) {
+  if (good.amount > 5) {
     goodCard.classList.add('card--in-stock');
   } else if (good.amount < 1) {
     goodCard.classList.add('card--soon');
   } else {
     goodCard.classList.add('card--little');
-  };
+  }
 
   goodTitle.textContent = good.name;
   goodPrice.childNodes[0].textContent = good.price + ' ';
   goodPrice.childNodes[2].textContent = '/ ' + good.weight + ' г';
 
   goodStarsRating.classList.remove('stars__rating--one', 'stars__rating--two', 'stars__rating--three', 'stars__rating--four', 'stars__rating--five');
-  switch (good.rating.value) {
-    case 1:
-      goodStarsRating.classList.add('stars__rating--one');
-      break;
-    case 2:
-      goodStarsRating.classList.add('stars__rating--two');
-      break;
-    case 3:
-      goodStarsRating.classList.add('stars__rating--three');
-      break;
-    case 4:
-      goodStarsRating.classList.add('stars__rating--four');
-      break;
-    case 5:
-      goodStarsRating.classList.add('stars__rating--five');
-      break;
-    default:
-      break;
-  }
+  goodStarsRating.classList.add(getRatingClass(good.rating.value));
 
   goodStarCount.textContent = '(' + good.rating.number + ')';
   goodCardCharacteristic.textContent = currentSugar + '. ' + good.ingredients.energy + ' ккал';
@@ -193,7 +200,7 @@ var renderGood = function (good) {
   goodCardPicture.setAttribute('src', good.picture);
 
   return goodCard;
-}
+};
 
 var renderOrderedGood = function (orderedGood) {
   var orderedGoodTemplate = document.querySelector('#card-order').content.querySelector('.goods_card');
@@ -207,7 +214,7 @@ var renderOrderedGood = function (orderedGood) {
   orderedGoodPicture.setAttribute('src', orderedGood.picture);
 
   return orderedGoodCard;
-}
+};
 
 var renderCart = function () {
   var cartGoods = generateGoods(CART_LENGTH);
@@ -235,6 +242,9 @@ var renderGoodsList = function () {
 
   goodsList.appendChild(fragment);
 };
+
+document.querySelector('.catalog__cards').classList.remove('catalog__cards--load');
+document.querySelector('.catalog__load').classList.add('visually-hidden');
 
 renderGoodsList();
 renderCart();
