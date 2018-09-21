@@ -83,8 +83,7 @@ var PICTURES = [
   'img/cards/soda-russian.jpg',
 ];
 
-var GOODS_LENGTH = 5;
-// var CART_LENGTH = 3;
+var GOODS_LENGTH = 26;
 var AMOUNT_MIN = 0;
 var AMOUNT_MAX = 20;
 var PRICE_MIN = 100;
@@ -247,13 +246,7 @@ var toggleForm = function () {
   var form = document.querySelector('.buy form');
   var inputs = form.querySelectorAll('input');
   var fieldSets = form.querySelectorAll('fieldset');
-  var disabledState;
-
-  if (!cart.length) {
-    disabledState = true;
-  } else {
-    disabledState = false;
-  }
+  var disabledState = cart.length === 0;
 
   for (var i = 0; i < inputs.length; i++) {
     inputs[i].disabled = disabledState;
@@ -266,7 +259,6 @@ var toggleForm = function () {
 
 // Создание корзины
 var renderCart = function () {
-  var cartGoods = cart;
   var fragment = document.createDocumentFragment();
   var cartBlock = document.querySelector('.goods__cards');
   var cartItems = document.querySelectorAll('.goods_card');
@@ -277,13 +269,13 @@ var renderCart = function () {
     cartItems[j].remove();
   }
 
-  for (var i = 0; i < cartGoods.length; i++) {
-    fragment.appendChild(renderOrderedGood(cartGoods[i]));
+  for (var i = 0; i < cart.length; i++) {
+    fragment.appendChild(renderOrderedGood(cart[i]));
   }
 
   cartBlock.appendChild(fragment);
 
-  if (cartGoods.length) {
+  if (cart.length) {
     cartBlock.classList.remove('goods__cards--empty');
     cartBlock.querySelector('.goods__card-empty').classList.add('visually-hidden');
     toggleForm();
@@ -329,8 +321,9 @@ var cart = [];
 
 var addToCart = function (goodID) {
   var isSimilar = false;
+  var currentItem = window.goods[goodID];
 
-  window.goods[goodID].amount--;
+  currentItem.amount--;
 
   for (var i = 0; i < cart.length; i++) {
     if (goodID === cart[i].id) {
@@ -344,9 +337,9 @@ var addToCart = function (goodID) {
     cart.push({
       id: goodID,
       orderedAmount: 1,
-      name: window.goods[goodID].name,
-      picture: window.goods[goodID].picture,
-      price: window.goods[goodID].price,
+      name: currentItem.name,
+      picture: currentItem.picture,
+      price: currentItem.price,
     });
   }
 
@@ -359,6 +352,7 @@ var removeCartItem = function (goodID) {
       window.goods[goodID].amount = window.goods[goodID].amount + cart[i].orderedAmount;
 
       cart.splice(i, 1);
+      break;
     }
   }
 
@@ -453,12 +447,13 @@ var initCart = function () {
 
 // Переключение вкладок в форме оформления заказа
 var initTabs = function () {
-  var radioInputs = document.querySelectorAll('.toggle-btn input[type="radio"]');
+  var paymentBlock = document.querySelector('.payment');
+  var deliverBlock = document.querySelector('.deliver');
 
   var onRadioInputChange = function (evt) {
     var currentInput = evt.target;
+    var currentParent = evt.currentTarget;
     var currentQuery = currentInput.getAttribute('id');
-    var currentParent = currentInput.parentElement.parentElement;
     var siblingInputs = currentParent.querySelectorAll('.toggle-btn input[type="radio"]');
     var classAdd = '';
 
@@ -477,20 +472,19 @@ var initTabs = function () {
     }
   };
 
-  for (var i = 0; i < radioInputs.length; i++) {
-    radioInputs[i].addEventListener('change', onRadioInputChange);
-  }
+  paymentBlock.addEventListener('change', onRadioInputChange);
+  deliverBlock.addEventListener('change', onRadioInputChange);
 };
 
 // Первая фаза работы фильтра по цене
 
 var initRangeFilter = function () {
   var RANGE = [0, 100];
-  var rangeButtons = document.querySelectorAll('.range__btn');
+  var rangeFilter = document.querySelector('.range__filter');
 
   var onMouseUp = function (evt) {
     var pinLeftOffset = evt.target.offsetLeft;
-    var parentWidth = evt.target.parentElement.offsetWidth;
+    var parentWidth = evt.currentTarget.offsetWidth;
     var pinPercent = pinLeftOffset / parentWidth;
     var pinValue = Math.floor((RANGE[1] - RANGE[0]) * pinPercent + RANGE[0]);
 
@@ -503,9 +497,7 @@ var initRangeFilter = function () {
     }
   };
 
-  for (var i = 0; i < rangeButtons.length; i++) {
-    rangeButtons[i].addEventListener('mouseup', onMouseUp);
-  }
+  rangeFilter.addEventListener('mouseup', onMouseUp);
 };
 
 toggleForm();
