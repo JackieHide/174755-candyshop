@@ -83,6 +83,14 @@ var PICTURES = [
   'img/cards/soda-russian.jpg',
 ];
 
+var NUMBER_LITERALS = {
+  1: 'one',
+  2: 'two',
+  3: 'three',
+  4: 'four',
+  5: 'five',
+};
+
 var GOODS_LENGTH = 26;
 var AMOUNT_MIN = 0;
 var AMOUNT_MAX = 20;
@@ -139,31 +147,9 @@ var generateGoods = function (goodsLength) {
   return defaultGoods;
 };
 
-// Присваивание рейтинга
+// Возвращение строки рейтинга
 var getRatingClass = function (number) {
-  var elemClass;
-
-  switch (number) {
-    case 1:
-      elemClass = 'stars__rating--one';
-      break;
-    case 2:
-      elemClass = 'stars__rating--two';
-      break;
-    case 3:
-      elemClass = 'stars__rating--three';
-      break;
-    case 4:
-      elemClass = 'stars__rating--four';
-      break;
-    case 5:
-      elemClass = 'stars__rating--five';
-      break;
-    default:
-      break;
-  }
-
-  return elemClass;
+  return 'stars__rating--' + NUMBER_LITERALS[number];
 };
 
 // Создавние карточки с мороженым
@@ -231,7 +217,7 @@ var setHeaderCartText = function () {
   var cartTotal = 0;
 
   for (var k = 0; k < cart.length; k++) {
-    cartTotal = cartTotal + cart[k].orderedAmount;
+    cartTotal += cart[k].orderedAmount;
   }
 
   if (!cartTotal) {
@@ -299,11 +285,6 @@ var renderGoodsList = function () {
   goodsList.appendChild(fragment);
 };
 
-document.querySelector('.catalog__cards').classList.remove('catalog__cards--load');
-document.querySelector('.catalog__load').classList.add('visually-hidden');
-
-renderGoodsList();
-
 // Добавление выбранного товара в избранное
 var initFavorite = function () {
   var onFavoriteClick = function (evt) {
@@ -318,22 +299,16 @@ var initFavorite = function () {
 
 // Добавление выбранного товара в корзину и управление товаром в корзине
 var cart = [];
+var cartIndexes = {};
 
 var addToCart = function (goodID) {
-  var isSimilar = false;
   var currentItem = window.goods[goodID];
 
   currentItem.amount--;
 
-  for (var i = 0; i < cart.length; i++) {
-    if (goodID === cart[i].id) {
-      isSimilar = true;
-
-      cart[i].orderedAmount++;
-    }
-  }
-
-  if (!isSimilar) {
+  if (cartIndexes[goodID] !== undefined) {
+    cart[cartIndexes[goodID]].orderedAmount++;
+  } else {
     cart.push({
       id: goodID,
       orderedAmount: 1,
@@ -341,19 +316,24 @@ var addToCart = function (goodID) {
       picture: currentItem.picture,
       price: currentItem.price,
     });
+
+    cartIndexes[goodID] = cart.length - 1;
   }
 
   renderCart();
 };
 
 var removeCartItem = function (goodID) {
-  for (var i = 0; i < cart.length; i++) {
-    if (goodID === cart[i].id) {
-      window.goods[goodID].amount = window.goods[goodID].amount + cart[i].orderedAmount;
+  if (cartIndexes[goodID] !== undefined) {
+    window.goods[goodID].amount = window.goods[goodID].amount + cart[cartIndexes[goodID]].orderedAmount;
 
-      cart.splice(i, 1);
-      break;
+    cart.splice(cartIndexes[goodID], 1);
+
+    for (var i = 0; i < cart.length; i++) {
+      cartIndexes[cart[i].id] = i;
     }
+
+    cartIndexes[goodID] = undefined;
   }
 
   renderCart();
@@ -364,10 +344,8 @@ var changeCartItemAmount = function (element, direction, goodID) {
   var itemCount = parseInt(itemCountElement.value, 10);
   var currentCartItem;
 
-  for (var i = 0; i < cart.length; i++) {
-    if (goodID === cart[i].id) {
-      currentCartItem = cart[i];
-    }
+  if (cartIndexes[goodID] !== undefined) {
+    currentCartItem = cart[cartIndexes[goodID]];
   }
 
   if (direction === 'decrease') {
@@ -499,6 +477,12 @@ var initRangeFilter = function () {
 
   rangeFilter.addEventListener('mouseup', onMouseUp);
 };
+
+
+document.querySelector('.catalog__cards').classList.remove('catalog__cards--load');
+document.querySelector('.catalog__load').classList.add('visually-hidden');
+
+renderGoodsList();
 
 toggleForm();
 initFavorite();
