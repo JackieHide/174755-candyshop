@@ -105,6 +105,18 @@ var NUMBER_MAX = 900;
 var ENERGY_MIN = 70;
 var ENERGY_MAX = 500;
 
+var BACKSPACE_KEY = 8;
+var TAB_KEY = 9;
+var ALLOWED_CARD_KEYS = [32, 43, 46, 8, 9, 27, 13, 107, 110, 187, 189, 190];
+var A_KEY = 65;
+var C_KEY = 67;
+var X_KEY = 88;
+var END_KEY = 35;
+var RIGHT_KEY = 39;
+var ZERO_KEY = 48;
+var NINE_KEY = 57;
+var NUMPAD_ZERO_KEY = 96;
+var NUMPAD_NINE_KEY = 105;
 
 var generateRandomNumber = function (min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -152,7 +164,7 @@ var getRatingClass = function (number) {
   return 'stars__rating--' + NUMBER_LITERALS[number];
 };
 
-// Создавние карточки с мороженым
+// Создание карточки с мороженым
 var renderGood = function (good, currentNumber) {
   var goodTemplate = document.querySelector('#card').content.querySelector('.catalog__card');
   var goodCard = goodTemplate.cloneNode(true);
@@ -216,8 +228,8 @@ var setHeaderCartText = function () {
   var headerCart = document.querySelector('.main-header__basket');
   var cartTotal = 0;
 
-  for (var k = 0; k < cart.length; k++) {
-    cartTotal += cart[k].orderedAmount;
+  for (var k = 0; k < basketItems.length; k++) {
+    cartTotal += basketItems[k].orderedAmount;
   }
 
   if (!cartTotal) {
@@ -231,8 +243,9 @@ var setHeaderCartText = function () {
 var toggleForm = function () {
   var form = document.querySelector('.buy form');
   var inputs = form.querySelectorAll('input');
+  var hiddenInputs = form.querySelectorAll('.visually-hidden input');
   var fieldSets = form.querySelectorAll('fieldset');
-  var disabledState = cart.length === 0;
+  var disabledState = basketItems.length === 0;
 
   for (var i = 0; i < inputs.length; i++) {
     inputs[i].disabled = disabledState;
@@ -241,27 +254,31 @@ var toggleForm = function () {
   for (var j = 0; j < fieldSets.length; j++) {
     fieldSets[j].disabled = disabledState;
   }
+
+  for (var k = 0; k < hiddenInputs.length; k++) {
+    hiddenInputs[k].disabled = true;
+  }
 };
 
 // Создание корзины
 var renderCart = function () {
   var fragment = document.createDocumentFragment();
   var cartBlock = document.querySelector('.goods__cards');
-  var cartItems = document.querySelectorAll('.goods_card');
+  var cartElements = document.querySelectorAll('.goods_card');
 
   setHeaderCartText();
 
-  for (var j = 0; j < cartItems.length; j++) {
-    cartItems[j].remove();
+  for (var j = 0; j < cartElements.length; j++) {
+    cartElements[j].remove();
   }
 
-  for (var i = 0; i < cart.length; i++) {
-    fragment.appendChild(renderOrderedGood(cart[i]));
+  for (var i = 0; i < basketItems.length; i++) {
+    fragment.appendChild(renderOrderedGood(basketItems[i]));
   }
 
   cartBlock.appendChild(fragment);
 
-  if (cart.length) {
+  if (basketItems.length) {
     cartBlock.classList.remove('goods__cards--empty');
     cartBlock.querySelector('.goods__card-empty').classList.add('visually-hidden');
     toggleForm();
@@ -298,7 +315,7 @@ var initFavorite = function () {
 };
 
 // Добавление выбранного товара в корзину и управление товаром в корзине
-var cart = [];
+var basketItems = [];
 var cartIndexes = {};
 
 var addToCart = function (goodID) {
@@ -307,9 +324,9 @@ var addToCart = function (goodID) {
   currentItem.amount--;
 
   if (cartIndexes[goodID] !== undefined) {
-    cart[cartIndexes[goodID]].orderedAmount++;
+    basketItems[cartIndexes[goodID]].orderedAmount++;
   } else {
-    cart.push({
+    basketItems.push({
       id: goodID,
       orderedAmount: 1,
       name: currentItem.name,
@@ -317,7 +334,7 @@ var addToCart = function (goodID) {
       price: currentItem.price,
     });
 
-    cartIndexes[goodID] = cart.length - 1;
+    cartIndexes[goodID] = basketItems.length - 1;
   }
 
   renderCart();
@@ -325,12 +342,12 @@ var addToCart = function (goodID) {
 
 var removeCartItem = function (goodID) {
   if (cartIndexes[goodID] !== undefined) {
-    window.goods[goodID].amount = window.goods[goodID].amount + cart[cartIndexes[goodID]].orderedAmount;
+    window.goods[goodID].amount = window.goods[goodID].amount + basketItems[cartIndexes[goodID]].orderedAmount;
 
-    cart.splice(cartIndexes[goodID], 1);
+    basketItems.splice(cartIndexes[goodID], 1);
 
-    for (var i = 0; i < cart.length; i++) {
-      cartIndexes[cart[i].id] = i;
+    for (var i = 0; i < basketItems.length; i++) {
+      cartIndexes[basketItems[i].id] = i;
     }
 
     cartIndexes[goodID] = undefined;
@@ -345,7 +362,7 @@ var changeCartItemAmount = function (element, direction, goodID) {
   var currentCartItem;
 
   if (cartIndexes[goodID] !== undefined) {
-    currentCartItem = cart[cartIndexes[goodID]];
+    currentCartItem = basketItems[cartIndexes[goodID]];
   }
 
   if (direction === 'decrease') {
@@ -435,18 +452,22 @@ var initTabs = function () {
     var siblingInputs = currentParent.querySelectorAll('.toggle-btn input[type="radio"]');
     var classAdd = '';
 
-    if (currentInput.parentElement.classList.contains('payment__method')) {
-      classAdd = '-wrap';
-    }
+    if (currentInput.getAttribute('type') === 'radio' && currentInput.classList.contains('toggle-btn__input')) {
+      if (currentInput.parentElement.classList.contains('payment__method')) {
+        classAdd = '-wrap';
+      }
 
-    for (var i = 0; i < siblingInputs.length; i++) {
-      currentParent
-        .querySelector('.' + siblingInputs[i].getAttribute('id') + classAdd)
-        .classList.add('visually-hidden');
-    }
+      for (var i = 0; i < siblingInputs.length; i++) {
+        currentParent
+          .querySelector('.' + siblingInputs[i].getAttribute('id') + classAdd)
+          .classList.add('visually-hidden');
+      }
 
-    if (currentInput.checked) {
-      currentParent.querySelector('.' + currentQuery + classAdd).classList.remove('visually-hidden');
+      if (currentInput.checked) {
+        currentParent.querySelector('.' + currentQuery + classAdd).classList.remove('visually-hidden');
+      }
+
+      toggleForm();
     }
   };
 
@@ -457,14 +478,14 @@ var initTabs = function () {
 // Первая фаза работы фильтра по цене
 
 var initRangeFilter = function () {
-  var RANGE = [0, 100];
+  var RANGE_NUMBERS = [0, 100];
   var rangeFilter = document.querySelector('.range__filter');
 
   var onMouseUp = function (evt) {
     var pinLeftOffset = evt.target.offsetLeft;
     var parentWidth = evt.currentTarget.offsetWidth;
     var pinPercent = pinLeftOffset / parentWidth;
-    var pinValue = Math.floor((RANGE[1] - RANGE[0]) * pinPercent + RANGE[0]);
+    var pinValue = Math.floor((RANGE_NUMBERS[1] - RANGE_NUMBERS[0]) * pinPercent + RANGE_NUMBERS[0]);
 
     if (evt.target.classList.contains('range__btn--right')) {
       document.querySelector('.range__price--max').textContent = pinValue;
@@ -478,6 +499,128 @@ var initRangeFilter = function () {
   rangeFilter.addEventListener('mouseup', onMouseUp);
 };
 
+// Проверка номера карты по алгоритму Луна, проверка нажатых клавиш
+var initForm = function () {
+  var form = document.querySelector('.buy form');
+  var paymentInputs = form.querySelector('.payment__inputs');
+  var cardInput = document.getElementById('payment__card-number');
+  var cardDateInput = document.getElementById('payment__card-date');
+  var cardCvcInput = document.getElementById('payment__card-cvc');
+  var cardHolderInput = document.getElementById('payment__cardholder');
+
+  var checkLuhn = function (cardNumber) {
+    var arr = cardNumber.split('').map(function (char, index) {
+      var digit = parseInt(char, 10);
+
+      if ((index + cardNumber.length) % 2 === 0) {
+        var digitX2 = digit * 2;
+
+        return digitX2 > 9 ? digitX2 - 9 : digitX2;
+      }
+
+      return digit;
+    });
+
+    return !(arr.reduce(function (a, b) {
+      return a + b;
+    }, 0) % 10);
+  };
+
+  // Добавление слэша в дату карты
+  var maskDate = function (input, evt) {
+    var value = cardDateInput.value.replace(/\D/g, '').slice(0, 10);
+
+    if (value.length >= 4 && evt.keyCode !== BACKSPACE_KEY && evt.keyCode !== TAB_KEY) {
+      evt.preventDefault();
+    } else if (value.length >= 3) {
+      cardDateInput.value = value.slice(0, 2) + '/' + value.slice(2);
+    }
+  };
+
+  // Ввод только цифр
+  var allowNumbersOnly = function (evt) {
+    if (ALLOWED_CARD_KEYS.indexOf(evt.keyCode) !== -1 ||
+    evt.keyCode === A_KEY && (evt.ctrlKey === true || evt.metaKey === true) ||
+    evt.keyCode === C_KEY && (evt.ctrlKey === true || evt.metaKey === true) ||
+    evt.keyCode === X_KEY && (evt.ctrlKey === true || evt.metaKey === true) ||
+    evt.keyCode >= END_KEY && evt.keyCode <= RIGHT_KEY) {
+      return;
+    }
+
+    if (((evt.keyCode < ZERO_KEY || evt.keyCode > NINE_KEY)) && (evt.keyCode < NUMPAD_ZERO_KEY || evt.keyCode > NUMPAD_NINE_KEY)) {
+      evt.preventDefault();
+    }
+  };
+
+  var cardDateInputMask = function (evt) {
+    allowNumbersOnly(evt);
+    maskDate(cardDateInput, evt);
+  };
+
+  var cardInputMask = function (evt) {
+    allowNumbersOnly(evt);
+
+    if (cardInput.value.length >= 16 && evt.keyCode !== BACKSPACE_KEY && evt.keyCode !== TAB_KEY) {
+      evt.preventDefault();
+    }
+  };
+
+  // Проверка валидности номера карты
+  var validateCard = function () {
+    var cardNumber = cardInput.value.replace(/\s/g, '').trim();
+
+    if (!checkLuhn(cardNumber)) {
+      cardInput.setCustomValidity('Введенная карта невалидна');
+    } else {
+      cardInput.setCustomValidity('');
+    }
+
+    if (cardInput.validity.valid &&
+        cardDateInput.validity.valid &&
+        cardCvcInput.validity.valid &&
+        cardHolderInput.validity.valid
+    ) {
+      form.querySelector('.payment__card-status').textContent = 'Одобрен';
+    } else {
+      form.querySelector('.payment__card-status').textContent = 'Не определен';
+    }
+  };
+
+  // Доставка товара по адресу из списка
+  var initDeliver = function () {
+    var deliverListElem = document.querySelector('.deliver__store-list');
+    var imgElem = document.querySelector('.deliver__store-map-img');
+    var imgRoot = 'img/map/';
+
+    var onRadioInputChange = function (evt) {
+      var currentInput = evt.target;
+      var currentImg = currentInput.value;
+
+      imgElem.setAttribute('src', imgRoot + currentImg + '.jpg');
+    };
+
+    deliverListElem.addEventListener('change', onRadioInputChange);
+  };
+
+  var onPaymentInputsChange = function (evt) {
+    if (evt.target.getAttribute('id') === 'payment__card-number') {
+      cardInputMask(evt);
+    }
+
+    if (evt.target.getAttribute('id') === 'payment__card-date') {
+      cardDateInputMask(evt);
+    }
+
+    validateCard();
+  };
+
+  paymentInputs.addEventListener('keyup', onPaymentInputsChange);
+  paymentInputs.addEventListener('keydown', onPaymentInputsChange);
+  paymentInputs.addEventListener('keypress', onPaymentInputsChange);
+  paymentInputs.addEventListener('change', onPaymentInputsChange);
+
+  initDeliver();
+};
 
 document.querySelector('.catalog__cards').classList.remove('catalog__cards--load');
 document.querySelector('.catalog__load').classList.add('visually-hidden');
@@ -489,4 +632,4 @@ initFavorite();
 initCart();
 initTabs();
 initRangeFilter();
-
+initForm();
