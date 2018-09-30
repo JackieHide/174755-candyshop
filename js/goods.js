@@ -107,16 +107,8 @@ var ENERGY_MAX = 500;
 
 var BACKSPACE_KEY = 8;
 var TAB_KEY = 9;
-var ALLOWED_CARD_KEYS = [32, 43, 46, 8, 9, 27, 13, 107, 110, 187, 189, 190];
-var A_KEY = 65;
-var C_KEY = 67;
-var X_KEY = 88;
-var END_KEY = 35;
+var LEFT_KEY = 37;
 var RIGHT_KEY = 39;
-var ZERO_KEY = 48;
-var NINE_KEY = 57;
-var NUMPAD_ZERO_KEY = 96;
-var NUMPAD_NINE_KEY = 105;
 
 var generateRandomNumber = function (min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -476,7 +468,6 @@ var initTabs = function () {
 };
 
 // Первая фаза работы фильтра по цене
-
 var initRangeFilter = function () {
   var RANGE_NUMBERS = [0, 100];
   var rangeFilter = document.querySelector('.range__filter');
@@ -530,7 +521,12 @@ var initForm = function () {
   var maskDate = function (input, evt) {
     var value = cardDateInput.value.replace(/\D/g, '').slice(0, 10);
 
-    if (value.length >= 4 && evt.keyCode !== BACKSPACE_KEY && evt.keyCode !== TAB_KEY) {
+    if (value.length >= 4 &&
+      evt.keyCode !== BACKSPACE_KEY &&
+      evt.keyCode !== TAB_KEY &&
+      evt.keyCode !== LEFT_KEY &&
+      evt.keyCode !== RIGHT_KEY
+    ) {
       evt.preventDefault();
     } else if (value.length >= 3) {
       cardDateInput.value = value.slice(0, 2) + '/' + value.slice(2);
@@ -539,17 +535,7 @@ var initForm = function () {
 
   // Ввод только цифр
   var allowNumbersOnly = function (evt) {
-    if (ALLOWED_CARD_KEYS.indexOf(evt.keyCode) !== -1 ||
-    evt.keyCode === A_KEY && (evt.ctrlKey === true || evt.metaKey === true) ||
-    evt.keyCode === C_KEY && (evt.ctrlKey === true || evt.metaKey === true) ||
-    evt.keyCode === X_KEY && (evt.ctrlKey === true || evt.metaKey === true) ||
-    evt.keyCode >= END_KEY && evt.keyCode <= RIGHT_KEY) {
-      return;
-    }
-
-    if (((evt.keyCode < ZERO_KEY || evt.keyCode > NINE_KEY)) && (evt.keyCode < NUMPAD_ZERO_KEY || evt.keyCode > NUMPAD_NINE_KEY)) {
-      evt.preventDefault();
-    }
+    evt.target.value = evt.target.value.replace(/(?!\/)[^\d]/g, '');
   };
 
   var cardDateInputMask = function (evt) {
@@ -560,7 +546,12 @@ var initForm = function () {
   var cardInputMask = function (evt) {
     allowNumbersOnly(evt);
 
-    if (cardInput.value.length >= 16 && evt.keyCode !== BACKSPACE_KEY && evt.keyCode !== TAB_KEY) {
+    if (cardInput.value.length >= 16 &&
+      evt.keyCode !== BACKSPACE_KEY &&
+      evt.keyCode !== TAB_KEY &&
+      evt.keyCode !== LEFT_KEY &&
+      evt.keyCode !== RIGHT_KEY
+    ) {
       evt.preventDefault();
     }
   };
