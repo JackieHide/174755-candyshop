@@ -471,23 +471,114 @@ var initTabs = function () {
 var initRangeFilter = function () {
   var RANGE_NUMBERS = [0, 100];
   var rangeFilter = document.querySelector('.range__filter');
+  var rangeLine = rangeFilter.querySelector('.range__fill-line');
+  var pinElems = rangeFilter.querySelectorAll('.range__btn');
 
-  var onMouseUp = function (evt) {
-    var pinLeftOffset = evt.target.offsetLeft;
-    var parentWidth = evt.currentTarget.offsetWidth;
+  var setPins = function (pinElem, event, startCoords, filterCoords) {
+    var shift = {
+      x: startCoords.x - (event.clientX - filterCoords.left),
+    };
+
+    startCoords.x = event.clientX - filterCoords.left;
+
+    var stopPosition = {
+      min: 0,
+      max: 0,
+    };
+
+    var positionValue;
+    var pinLeftOffset = pinElem.offsetLeft;
+    var parentWidth = rangeFilter.offsetWidth;
+
+    if (pinElem.classList.contains('range__btn--right')) {
+      stopPosition.min = document.querySelector('.range__btn--left').offsetLeft + document.querySelector('.range__btn--left').offsetWidth;
+      stopPosition.max = rangeFilter.offsetWidth;
+    }
+
+    if (pinElem.classList.contains('range__btn--left')) {
+      stopPosition.max = document.querySelector('.range__btn--right').offsetLeft - pinElem.offsetWidth;
+      stopPosition.min = 0;
+    }
+
+    positionValue = pinLeftOffset - shift.x;
+
+    if (positionValue >= stopPosition.max) {
+      positionValue = stopPosition.max;
+    } else if (positionValue <= stopPosition.min) {
+      positionValue = stopPosition.min;
+    }
+
+    pinElem.style.left = positionValue + 'px';
+    pinElem.style.transform = 'translateX(-50%)';
+    rangeLine.style.left = document.querySelector('.range__btn--left').offsetLeft + 'px';
+    rangeLine.style.right = rangeFilter.offsetWidth - document.querySelector('.range__btn--right').offsetLeft + 'px';
+
+    pinLeftOffset = pinElem.offsetLeft;
     var pinPercent = pinLeftOffset / parentWidth;
     var pinValue = Math.floor((RANGE_NUMBERS[1] - RANGE_NUMBERS[0]) * pinPercent + RANGE_NUMBERS[0]);
 
-    if (evt.target.classList.contains('range__btn--right')) {
+    if (pinElem.classList.contains('range__btn--right')) {
       document.querySelector('.range__price--max').textContent = pinValue;
     }
 
-    if (evt.target.classList.contains('range__btn--left')) {
+    if (pinElem.classList.contains('range__btn--left')) {
       document.querySelector('.range__price--min').textContent = pinValue;
     }
   };
 
-  rangeFilter.addEventListener('mouseup', onMouseUp);
+  var initPinDrag = function (pinElem) {
+    var rect = rangeFilter.getBoundingClientRect();
+
+    pinElem.addEventListener('mousedown', function (evt) {
+      evt.preventDefault();
+
+      var startCoords = {
+        x: evt.clientX - rect.left,
+      };
+
+      var onMouseMove = function (moveEvt) {
+        moveEvt.preventDefault();
+
+        setPins(pinElem, moveEvt, startCoords, rect);
+      };
+
+      var onMouseUp = function (upEvt) {
+        upEvt.preventDefault();
+
+        document.removeEventListener('mousemove', onMouseMove);
+        document.removeEventListener('mouseup', onMouseUp);
+
+        setPins(pinElem, upEvt, startCoords, rect);
+      };
+
+      document.addEventListener('mousemove', onMouseMove);
+      document.addEventListener('mouseup', onMouseUp);
+    });
+  };
+
+  for (var i = 0; i < pinElems.length; i++) {
+    initPinDrag(pinElems[i]);
+  }
+
+  rangeFilter.addEventListener('click', function (clickEvt) {
+    var filterCoords = rangeFilter.getBoundingClientRect();
+    var clickOffsetX = clickEvt.clientX - filterCoords.left;
+
+    var startCoords = {
+      x: 0,
+    };
+
+    var rightPinPos = Math.abs(document.querySelector('.range__btn--right').offsetLeft - clickOffsetX);
+    var leftPinPos = Math.abs(document.querySelector('.range__btn--left').offsetLeft - clickOffsetX);
+
+    if (rightPinPos > leftPinPos) {
+      startCoords.x = document.querySelector('.range__btn--left').offsetLeft;
+      setPins(document.querySelector('.range__btn--left'), clickEvt, startCoords, filterCoords);
+    } else {
+      startCoords.x = document.querySelector('.range__btn--right').offsetLeft;
+      setPins(document.querySelector('.range__btn--right'), clickEvt, startCoords, filterCoords);
+    }
+  });
 };
 
 // Проверка номера карты по алгоритму Луна, проверка нажатых клавиш
