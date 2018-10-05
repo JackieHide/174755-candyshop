@@ -110,6 +110,8 @@ var TAB_KEY = 9;
 var LEFT_KEY = 37;
 var RIGHT_KEY = 39;
 
+var CART_BLOCK_EMPTY = document.querySelector('.goods__card-empty');
+
 var generateRandomNumber = function (min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 };
@@ -190,9 +192,9 @@ var renderGood = function (good, currentNumber) {
   goodStarCount.textContent = '(' + good.rating.number + ')';
   goodCardCharacteristic.textContent = currentSugar + '. ' + good.nutritionFacts.energy + ' ккал';
   goodCardComposition.textContent = good.nutritionFacts.contents;
-  goodCardPicture.setAttribute('src', good.picture);
+  goodCardPicture.src = good.picture;
 
-  goodCartButton.setAttribute('data-id', currentNumber);
+  goodCartButton.dataset.id = currentNumber;
 
   return goodCard;
 };
@@ -206,10 +208,10 @@ var renderOrderedGood = function (orderedGood) {
   var orderedGoodPicture = orderedGoodCard.querySelector('.card-order__img');
   var orderedGoodCount = orderedGoodCard.querySelector('.card-order__count');
 
-  orderedGoodCard.setAttribute('data-id', orderedGood.id);
+  orderedGoodCard.dataset.id = orderedGood.id;
   orderedGoodTitle.textContent = orderedGood.name;
   orderedGoodPrice.textContent = orderedGood.price + ' ₽';
-  orderedGoodPicture.setAttribute('src', orderedGood.picture);
+  orderedGoodPicture.src = orderedGood.picture;
   orderedGoodCount.value = orderedGood.orderedAmount;
 
   return orderedGoodCard;
@@ -272,11 +274,11 @@ var renderCart = function () {
 
   if (basketItems.length) {
     cartBlock.classList.remove('goods__cards--empty');
-    cartBlock.querySelector('.goods__card-empty').classList.add('visually-hidden');
+    CART_BLOCK_EMPTY.classList.add('visually-hidden');
     toggleForm();
   } else {
     cartBlock.classList.add('goods__cards--empty');
-    cartBlock.querySelector('.goods__card-empty').classList.remove('visually-hidden');
+    CART_BLOCK_EMPTY.classList.remove('visually-hidden');
     toggleForm();
   }
 };
@@ -384,7 +386,7 @@ var changeCartItemAmount = function (element, direction, goodID) {
 var initCart = function () {
   var onAddToCartClick = function (evt) {
     if (evt.target.classList.contains('card__btn')) {
-      var currentId = evt.target.getAttribute('data-id');
+      var currentId = evt.target.dataset.id;
 
       evt.preventDefault();
 
@@ -396,7 +398,7 @@ var initCart = function () {
 
   var onCartOrderCloseClick = function (evt) {
     if (evt.target.classList.contains('card-order__close')) {
-      var currentId = evt.target.parentElement.getAttribute('data-id');
+      var currentId = evt.target.parentElement.dataset.id;
 
       evt.preventDefault();
 
@@ -407,7 +409,7 @@ var initCart = function () {
   var onCardOrderDecreaseClick = function (evt) {
     if (evt.target.classList.contains('card-order__btn--decrease')) {
       var parent = evt.target.parentElement.parentElement.parentElement;
-      var currentId = parent.getAttribute('data-id');
+      var currentId = parent.dataset.id;
 
       evt.preventDefault();
 
@@ -418,7 +420,7 @@ var initCart = function () {
   var onCardOrderIncreaseClick = function (evt) {
     if (evt.target.classList.contains('card-order__btn--increase')) {
       var parent = evt.target.parentElement.parentElement.parentElement;
-      var currentId = parent.getAttribute('data-id');
+      var currentId = parent.dataset.id;
 
       evt.preventDefault();
 
@@ -440,18 +442,18 @@ var initTabs = function () {
   var onRadioInputChange = function (evt) {
     var currentInput = evt.target;
     var currentParent = evt.currentTarget;
-    var currentQuery = currentInput.getAttribute('id');
+    var currentQuery = currentInput.id;
     var siblingInputs = currentParent.querySelectorAll('.toggle-btn input[type="radio"]');
     var classAdd = '';
 
-    if (currentInput.getAttribute('type') === 'radio' && currentInput.classList.contains('toggle-btn__input')) {
+    if (currentInput.type === 'radio' && currentInput.classList.contains('toggle-btn__input')) {
       if (currentInput.parentElement.classList.contains('payment__method')) {
         classAdd = '-wrap';
       }
 
       for (var i = 0; i < siblingInputs.length; i++) {
         currentParent
-          .querySelector('.' + siblingInputs[i].getAttribute('id') + classAdd)
+          .querySelector('.' + siblingInputs[i].id + classAdd)
           .classList.add('visually-hidden');
       }
 
@@ -473,6 +475,10 @@ var initRangeFilter = function () {
   var rangeFilter = document.querySelector('.range__filter');
   var rangeLine = rangeFilter.querySelector('.range__fill-line');
   var pinElems = rangeFilter.querySelectorAll('.range__btn');
+  var rangeBtnLeft = document.querySelector('.range__btn--left');
+  var rangeBtnRight = document.querySelector('.range__btn--right');
+  var rangePriceMax = document.querySelector('.range__price--max');
+  var rangePriceMin = document.querySelector('.range__price--min');
 
   var setPins = function (pinElem, event, startCoords, filterCoords) {
     var shift = {
@@ -491,12 +497,12 @@ var initRangeFilter = function () {
     var parentWidth = rangeFilter.offsetWidth;
 
     if (pinElem.classList.contains('range__btn--right')) {
-      stopPosition.min = document.querySelector('.range__btn--left').offsetLeft + document.querySelector('.range__btn--left').offsetWidth;
+      stopPosition.min = rangeBtnLeft.offsetLeft + rangeBtnLeft.offsetWidth;
       stopPosition.max = rangeFilter.offsetWidth;
     }
 
     if (pinElem.classList.contains('range__btn--left')) {
-      stopPosition.max = document.querySelector('.range__btn--right').offsetLeft - pinElem.offsetWidth;
+      stopPosition.max = rangeBtnRight.offsetLeft - pinElem.offsetWidth;
       stopPosition.min = 0;
     }
 
@@ -509,20 +515,19 @@ var initRangeFilter = function () {
     }
 
     pinElem.style.left = positionValue + 'px';
-    pinElem.style.transform = 'translateX(-50%)';
-    rangeLine.style.left = document.querySelector('.range__btn--left').offsetLeft + 'px';
-    rangeLine.style.right = rangeFilter.offsetWidth - document.querySelector('.range__btn--right').offsetLeft + 'px';
+    rangeLine.style.left = rangeBtnLeft.offsetLeft + 'px';
+    rangeLine.style.right = rangeFilter.offsetWidth - rangeBtnRight.offsetLeft + 'px';
 
     pinLeftOffset = pinElem.offsetLeft;
     var pinPercent = pinLeftOffset / parentWidth;
     var pinValue = Math.floor((RANGE_NUMBERS[1] - RANGE_NUMBERS[0]) * pinPercent + RANGE_NUMBERS[0]);
 
     if (pinElem.classList.contains('range__btn--right')) {
-      document.querySelector('.range__price--max').textContent = pinValue;
+      rangePriceMax.textContent = pinValue;
     }
 
     if (pinElem.classList.contains('range__btn--left')) {
-      document.querySelector('.range__price--min').textContent = pinValue;
+      rangePriceMin.textContent = pinValue;
     }
   };
 
@@ -568,15 +573,15 @@ var initRangeFilter = function () {
       x: 0,
     };
 
-    var rightPinPos = Math.abs(document.querySelector('.range__btn--right').offsetLeft - clickOffsetX);
-    var leftPinPos = Math.abs(document.querySelector('.range__btn--left').offsetLeft - clickOffsetX);
+    var rightPinPos = Math.abs(rangeBtnRight.offsetLeft - clickOffsetX);
+    var leftPinPos = Math.abs(rangeBtnLeft.offsetLeft - clickOffsetX);
 
     if (rightPinPos > leftPinPos) {
-      startCoords.x = document.querySelector('.range__btn--left').offsetLeft;
-      setPins(document.querySelector('.range__btn--left'), clickEvt, startCoords, filterCoords);
+      startCoords.x = rangeBtnLeft.offsetLeft;
+      setPins(rangeBtnLeft, clickEvt, startCoords, filterCoords);
     } else {
-      startCoords.x = document.querySelector('.range__btn--right').offsetLeft;
-      setPins(document.querySelector('.range__btn--right'), clickEvt, startCoords, filterCoords);
+      startCoords.x = rangeBtnRight.offsetLeft;
+      setPins(rangeBtnRight, clickEvt, startCoords, filterCoords);
     }
   });
 };
@@ -678,18 +683,18 @@ var initForm = function () {
       var currentInput = evt.target;
       var currentImg = currentInput.value;
 
-      imgElem.setAttribute('src', imgRoot + currentImg + '.jpg');
+      imgElem.src = imgRoot + currentImg + '.jpg';
     };
 
     deliverListElem.addEventListener('change', onRadioInputChange);
   };
 
   var onPaymentInputsChange = function (evt) {
-    if (evt.target.getAttribute('id') === 'payment__card-number') {
+    if (evt.target.id === 'payment__card-number') {
       cardInputMask(evt);
     }
 
-    if (evt.target.getAttribute('id') === 'payment__card-date') {
+    if (evt.target.id === 'payment__card-date') {
       cardDateInputMask(evt);
     }
 
