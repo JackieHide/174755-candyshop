@@ -15,7 +15,7 @@
     orderedGoodCard.dataset.id = orderedGood.id;
     orderedGoodTitle.textContent = orderedGood.name;
     orderedGoodPrice.textContent = orderedGood.price + ' ₽';
-    orderedGoodPicture.src = orderedGood.picture;
+    orderedGoodPicture.src = 'img/cards/' + orderedGood.picture;
     orderedGoodCount.value = orderedGood.orderedAmount;
 
     return orderedGoodCard;

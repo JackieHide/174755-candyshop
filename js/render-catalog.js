@@ -35,7 +35,7 @@
     goodStarCount.textContent = '(' + good.rating.number + ')';
     goodCardCharacteristic.textContent = currentSugar + '. ' + good.nutritionFacts.energy + ' ккал';
     goodCardComposition.textContent = good.nutritionFacts.contents;
-    goodCardPicture.src = good.picture;
+    goodCardPicture.src = 'img/cards/' + good.picture;
 
     goodCartButton.dataset.id = currentNumber;
 
@@ -47,11 +47,17 @@
     var fragment = document.createDocumentFragment();
     var goodsList = document.querySelector('.catalog__cards');
 
-    for (var i = 0; i < window.goods.length; i++) {
-      fragment.appendChild(renderGood(window.goods[i], i));
-    }
+    var successHandler = function (response) {
+      window.goods = response;
 
-    goodsList.appendChild(fragment);
+      for (var i = 0; i < window.goods.length; i++) {
+        fragment.appendChild(renderGood(window.goods[i], i));
+      }
+
+      goodsList.appendChild(fragment);
+    };
+
+    window.backend.load(successHandler, window.modals.showErrorModal);
   };
 
   document.querySelector('.catalog__cards').classList.remove('catalog__cards--load');

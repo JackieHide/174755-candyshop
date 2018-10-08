@@ -115,7 +115,7 @@
 
     var onCardOrderDecreaseClick = function (evt) {
       if (evt.target.classList.contains('card-order__btn--decrease')) {
-        var parent = evt.target.parentElement.parentElement.parentElement;
+        var parent = evt.target.closest('.goods_card');
         var currentId = parent.dataset.id;
 
         evt.preventDefault();
@@ -126,7 +126,7 @@
 
     var onCardOrderIncreaseClick = function (evt) {
       if (evt.target.classList.contains('card-order__btn--increase')) {
-        var parent = evt.target.parentElement.parentElement.parentElement;
+        var parent = evt.target.closest('.goods_card');
         var currentId = parent.dataset.id;
 
         evt.preventDefault();

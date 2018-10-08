@@ -9,6 +9,7 @@
   // Включение/выключение формы
   window.toggleForm = function () {
     var form = document.querySelector('.buy form');
+    var button = form.querySelector('button[type="submit"]');
     var inputs = form.querySelectorAll('input');
     var hiddenInputs = form.querySelectorAll('.visually-hidden input');
     var fieldSets = form.querySelectorAll('fieldset');
@@ -25,6 +26,8 @@
     for (var k = 0; k < hiddenInputs.length; k++) {
       hiddenInputs[k].disabled = true;
     }
+
+    button.disabled = disabledState;
   };
 
   // Переключение вкладок в форме оформления заказа
@@ -70,6 +73,17 @@
     var cardDateInput = document.getElementById('payment__card-date');
     var cardCvcInput = document.getElementById('payment__card-cvc');
     var cardHolderInput = document.getElementById('payment__cardholder');
+
+    var clearForm = function () {
+      var inputs = form.querySelectorAll('input');
+      var cardStatus = form.querySelector('.payment__card-status');
+
+      for (var i = 0; i < inputs.length; i++) {
+        inputs[i].value = '';
+      }
+
+      cardStatus.textContent = 'Не определён';
+    };
 
     var checkLuhn = function (cardNumber) {
       var arr = cardNumber.split('').map(function (char, index) {
@@ -165,6 +179,11 @@
       deliverListElem.addEventListener('change', onRadioInputChange);
     };
 
+    var formSuccessHandler = function () {
+      clearForm();
+      window.modals.showSuccessModal();
+    };
+
     var onPaymentInputsChange = function (evt) {
       if (evt.target.id === 'payment__card-number') {
         cardInputMask(evt);
@@ -183,6 +202,11 @@
     paymentInputs.addEventListener('change', onPaymentInputsChange);
 
     initDeliver();
+
+    form.addEventListener('submit', function (evt) {
+      window.backend.save(new FormData(form), formSuccessHandler, window.modals.showErrorModal);
+      evt.preventDefault();
+    });
   };
 
   window.toggleForm();
