@@ -10,8 +10,17 @@
   var initFavorite = function () {
     var onFavoriteClick = function (evt) {
       if (evt.target.classList.contains('card__btn-favorite')) {
+        var currentId = evt.target.parentElement.querySelector('.card__btn').dataset.id;
+
         evt.preventDefault();
-        evt.target.classList.toggle('card__btn-favorite--selected');
+
+        if (evt.target.classList.contains('card__btn-favorite--selected')) {
+          evt.target.classList.remove('card__btn-favorite--selected');
+          window.goods[currentId].isFavorite = false;
+        } else {
+          evt.target.classList.add('card__btn-favorite--selected');
+          window.goods[currentId].isFavorite = true;
+        }
       }
     };
 

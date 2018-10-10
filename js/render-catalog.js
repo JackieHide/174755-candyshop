@@ -1,6 +1,8 @@
 'use strict';
 
 (function () {
+  var goodsList = document.querySelector('.catalog__cards');
+
   // Создание карточки с мороженым
   var renderGood = function (good, currentNumber) {
     var goodTemplate = document.querySelector('#card').content.querySelector('.catalog__card');
@@ -14,6 +16,7 @@
     var goodCardPicture = goodCard.querySelector('.card__img');
     var currentSugar = good.nutritionFacts.sugar ? 'Содержит сахар' : 'Без сахара';
     var goodCartButton = goodCard.querySelector('.card__btn');
+    var goodCartButtonFavorite = goodCard.querySelector('.card__btn-favorite');
 
     goodCard.classList.remove('card--in-stock', 'card--little', 'card--soon');
 
@@ -23,6 +26,10 @@
       goodCard.classList.add('card--soon');
     } else {
       goodCard.classList.add('card--little');
+    }
+
+    if (good.isFavorite) {
+      goodCartButtonFavorite.classList.add('card__btn-favorite--selected');
     }
 
     goodTitle.textContent = good.name;
@@ -43,25 +50,31 @@
   };
 
   // Создание списка карточек с мороженым
-  var renderGoodsList = function () {
-    var fragment = document.createDocumentFragment();
-    var goodsList = document.querySelector('.catalog__cards');
+  window.renderGoodsList = function (data) {
+    var currentCards = goodsList.querySelectorAll('.catalog__card');
+    var currentEmptyMsg = goodsList.querySelector('.catalog__empty-filter');
 
-    var successHandler = function (response) {
-      window.goods = response;
+    currentCards.forEach(function (elem) {
+      elem.remove();
+    });
 
-      for (var i = 0; i < window.goods.length; i++) {
-        fragment.appendChild(renderGood(window.goods[i], i));
+    if (currentEmptyMsg) {
+      currentEmptyMsg.remove();
+    }
+
+    if (data.length) {
+      var fragment = document.createDocumentFragment();
+
+      for (var i = 0; i < data.length; i++) {
+        fragment.appendChild(renderGood(data[i], data[i].id));
       }
 
       goodsList.appendChild(fragment);
-    };
+    } else {
+      var emptyTemplate = document.querySelector('#empty-filters').content.querySelector('.catalog__empty-filter');
+      var emptyBlock = emptyTemplate.cloneNode(true);
 
-    window.backend.load(successHandler, window.modals.showErrorModal);
+      goodsList.appendChild(emptyBlock);
+    }
   };
-
-  document.querySelector('.catalog__cards').classList.remove('catalog__cards--load');
-  document.querySelector('.catalog__load').classList.add('visually-hidden');
-
-  renderGoodsList();
 })();

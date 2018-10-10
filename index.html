@@ -28,7 +28,7 @@
 
           <ul class="catalog__filter">
             <li class="input-btn">
-              <input class="input-btn__input visually-hidden input-btn__input--checkbox" name="food-type" value="icecream" type="checkbox" id="filter-icecream" >
+              <input class="input-btn__input visually-hidden input-btn__input--checkbox" name="food-type" value="icecream" type="checkbox" id="filter-icecream">
               <label class="input-btn__label input-btn__label--checkbox" for="filter-icecream">Мороженное</label>
               <span class="input-btn__item-count">(7)</span>
             </li>
@@ -60,7 +60,7 @@
 
           <ul class="catalog__filter">
             <li class="input-btn">
-              <input class="input-btn__input visually-hidden input-btn__input--checkbox" name="food-property" value="sugar-free" type="checkbox" id="filter-sugar-free" >
+              <input class="input-btn__input visually-hidden input-btn__input--checkbox" name="food-property" value="sugar-free" type="checkbox" id="filter-sugar-free">
               <label class="input-btn__label input-btn__label--checkbox" for="filter-sugar-free">Без сахара</label>
               <span class="input-btn__item-count">(5)</span>
             </li>
@@ -87,8 +87,8 @@
               <button class="range__btn range__btn--right" type="button">правый ползунок</button>
             </div>
             <div class="range__prices">
-              <span class="range__price range__price--min">60</span>
-              <span class="range__price range__price--max">230</span>
+              <span class="range__price range__price--min">0</span>
+              <span class="range__price range__price--max">100</span>
             </div>
           </section>
 
@@ -483,14 +483,16 @@
     </div>
   </template>
 
+  <script src="js/debounce.js"></script>
   <script src="js/util.js"></script>
   <script src="js/backend.js"></script>
   <script src="js/modals.js"></script>
-  <!-- <script src="js/data.js"></script> -->
   <script src="js/order.js"></script>
   <script src="js/render-catalog.js"></script>
   <script src="js/render-cart.js"></script>
-  <script src="js/catalog.js"></script>
   <script src="js/filter.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/catalog.js"></script>
+  <script src="js/range-slider.js"></script>
 </body>
 </html>
