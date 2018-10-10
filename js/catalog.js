@@ -6,25 +6,23 @@
 
   window.basketItems = basketItems;
 
+  var catalogList = document.querySelector('.catalog__cards');
+  var cartList = document.querySelector('.goods__cards');
+
   // Добавление выбранного товара в избранное
   var initFavorite = function () {
     var onFavoriteClick = function (evt) {
       if (evt.target.classList.contains('card__btn-favorite')) {
-        var currentId = evt.target.parentElement.querySelector('.card__btn').dataset.id;
+        var currentId = evt.target.closest('.card__btns-wrap').querySelector('.card__btn').dataset.id;
 
         evt.preventDefault();
 
-        if (evt.target.classList.contains('card__btn-favorite--selected')) {
-          evt.target.classList.remove('card__btn-favorite--selected');
-          window.goods[currentId].isFavorite = false;
-        } else {
-          evt.target.classList.add('card__btn-favorite--selected');
-          window.goods[currentId].isFavorite = true;
-        }
+        evt.target.classList.toggle('card__btn-favorite--selected');
+        window.goods[currentId].isFavorite = evt.target.classList.contains('card__btn-favorite--selected');
       }
     };
 
-    document.addEventListener('click', onFavoriteClick);
+    catalogList.addEventListener('click', onFavoriteClick);
   };
 
   // Добавление выбранного товара в корзину и управление товаром в корзине
@@ -144,10 +142,10 @@
       }
     };
 
-    document.addEventListener('click', onAddToCartClick);
-    document.addEventListener('click', onCartOrderCloseClick);
-    document.addEventListener('click', onCardOrderDecreaseClick);
-    document.addEventListener('click', onCardOrderIncreaseClick);
+    catalogList.addEventListener('click', onAddToCartClick);
+    cartList.addEventListener('click', onCartOrderCloseClick);
+    cartList.addEventListener('click', onCardOrderDecreaseClick);
+    cartList.addEventListener('click', onCardOrderIncreaseClick);
   };
 
   initFavorite();

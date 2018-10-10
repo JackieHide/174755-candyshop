@@ -19,21 +19,13 @@
     rangeLine.style.right = '0px';
   };
 
-  var setPins = function (pinElem, event, startCoords, filterCoords) {
-    var shift = {
-      x: startCoords.x - (event.clientX - filterCoords.left),
-    };
-
-    startCoords.x = event.clientX - filterCoords.left;
-
+  var getPinPosition = function (pinElem, pinLeftOffset, shift) {
     var stopPosition = {
       min: 0,
       max: 0,
     };
 
     var positionValue;
-    var pinLeftOffset = pinElem.offsetLeft;
-    var parentWidth = rangeFilter.offsetWidth;
 
     if (pinElem.classList.contains('range__btn--right')) {
       stopPosition.min = rangeBtnLeft.offsetLeft + rangeBtnLeft.offsetWidth;
@@ -53,11 +45,10 @@
       positionValue = stopPosition.min;
     }
 
-    pinElem.style.left = positionValue + 'px';
-    rangeLine.style.left = rangeBtnLeft.offsetLeft + 'px';
-    rangeLine.style.right = rangeFilter.offsetWidth - rangeBtnRight.offsetLeft + 'px';
+    return positionValue;
+  };
 
-    pinLeftOffset = pinElem.offsetLeft;
+  var setPinValue = function (pinElem, pinLeftOffset, parentWidth) {
     var pinPercent = pinLeftOffset / parentWidth;
     var pinValue = Math.floor((window.util.RANGE_NUMBERS[1] - window.util.RANGE_NUMBERS[0]) * pinPercent + window.util.RANGE_NUMBERS[0]);
 
@@ -68,6 +59,26 @@
     if (pinElem.classList.contains('range__btn--left')) {
       rangePriceMin.textContent = pinValue;
     }
+  };
+
+  var setPins = function (pinElem, event, startCoords, filterCoords) {
+    var shift = {
+      x: startCoords.x - (event.clientX - filterCoords.left),
+    };
+
+    startCoords.x = event.clientX - filterCoords.left;
+
+    var pinLeftOffset = pinElem.offsetLeft;
+    var parentWidth = rangeFilter.offsetWidth;
+    var positionValue = getPinPosition(pinElem, pinLeftOffset, shift);
+
+    pinElem.style.left = positionValue + 'px';
+    rangeLine.style.left = rangeBtnLeft.offsetLeft + 'px';
+    rangeLine.style.right = rangeFilter.offsetWidth - rangeBtnRight.offsetLeft + 'px';
+
+    pinLeftOffset = pinElem.offsetLeft;
+
+    setPinValue(pinElem, pinLeftOffset, parentWidth);
   };
 
   var initPinDrag = function (pinElem) {
