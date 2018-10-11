@@ -54,9 +54,9 @@
 
       basketItems.splice(cartIndexes[goodID], 1);
 
-      for (var i = 0; i < basketItems.length; i++) {
-        cartIndexes[basketItems[i].id] = i;
-      }
+      basketItems.forEach(function (basketItem, index) {
+        cartIndexes[basketItem.id] = index;
+      });
 
       cartIndexes[goodID] = undefined;
     }
@@ -75,15 +75,15 @@
 
     if (direction === 'decrease') {
       if (itemCount !== 0) {
-        itemCount -= 1;
-        window.goods[goodID].amount += 1;
+        itemCount--;
+        window.goods[goodID].amount++;
       }
     }
 
     if (direction === 'increase') {
       if (window.goods[goodID].amount !== 0) {
-        window.goods[goodID].amount -= 1;
-        itemCount += 1;
+        window.goods[goodID].amount--;
+        itemCount++;
       }
     }
 

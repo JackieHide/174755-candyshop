@@ -84,7 +84,7 @@
   var initPinDrag = function (pinElem) {
     var rect = rangeFilter.getBoundingClientRect();
 
-    pinElem.addEventListener('mousedown', function (evt) {
+    var onPinElemMouseDown = function (evt) {
       evt.preventDefault();
 
       var startCoords = {
@@ -110,14 +110,12 @@
 
       document.addEventListener('mousemove', onMouseMove);
       document.addEventListener('mouseup', onMouseUp);
-    });
+    };
+
+    pinElem.addEventListener('mousedown', onPinElemMouseDown);
   };
 
-  for (var i = 0; i < pinElems.length; i++) {
-    initPinDrag(pinElems[i]);
-  }
-
-  rangeFilter.addEventListener('click', function (clickEvt) {
+  var onRangeSliderClick = function (clickEvt) {
     var filterCoords = rangeFilter.getBoundingClientRect();
     var clickOffsetX = clickEvt.clientX - filterCoords.left;
 
@@ -137,7 +135,13 @@
     }
 
     window.applyFilter();
+  };
+
+  pinElems.forEach(function (pin) {
+    initPinDrag(pin);
   });
+
+  rangeFilter.addEventListener('click', onRangeSliderClick);
 
   window.rangeSliderSetDefault();
 })();

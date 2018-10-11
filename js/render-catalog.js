@@ -49,11 +49,8 @@
     return goodCard;
   };
 
-  // Создание списка карточек с мороженым
-  window.renderGoodsList = function (data) {
-    var currentCards = goodsList.querySelectorAll('.catalog__card');
-    var currentEmptyMsg = goodsList.querySelector('.catalog__empty-filter');
-
+  // очистка списка карточек с мороженым
+  var clearGoodsList = function (currentCards, currentEmptyMsg) {
     currentCards.forEach(function (elem) {
       elem.remove();
     });
@@ -61,20 +58,38 @@
     if (currentEmptyMsg) {
       currentEmptyMsg.remove();
     }
+  };
+
+  // заполнение списка карточек с мороженым
+  var fillGoodsList = function (data) {
+    var fragment = document.createDocumentFragment();
+
+    data.forEach(function (dataItem) {
+      fragment.appendChild(renderGood(dataItem, dataItem.id));
+    });
+
+    goodsList.appendChild(fragment);
+  };
+
+  // добавление блока пустого списка
+  var addEmptyListMarker = function () {
+    var emptyTemplate = document.querySelector('#empty-filters').content.querySelector('.catalog__empty-filter');
+    var emptyBlock = emptyTemplate.cloneNode(true);
+
+    goodsList.appendChild(emptyBlock);
+  };
+
+  // Создание списка карточек с мороженым
+  window.renderGoodsList = function (data) {
+    var currentCards = goodsList.querySelectorAll('.catalog__card');
+    var currentEmptyMsg = goodsList.querySelector('.catalog__empty-filter');
+
+    clearGoodsList(currentCards, currentEmptyMsg);
 
     if (data.length) {
-      var fragment = document.createDocumentFragment();
-
-      for (var i = 0; i < data.length; i++) {
-        fragment.appendChild(renderGood(data[i], data[i].id));
-      }
-
-      goodsList.appendChild(fragment);
+      fillGoodsList(data);
     } else {
-      var emptyTemplate = document.querySelector('#empty-filters').content.querySelector('.catalog__empty-filter');
-      var emptyBlock = emptyTemplate.cloneNode(true);
-
-      goodsList.appendChild(emptyBlock);
+      addEmptyListMarker();
     }
   };
 })();

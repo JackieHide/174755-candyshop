@@ -42,9 +42,9 @@
     },
 
     hideModals: function () {
-      for (var i = 0; i < modals.length; i++) {
-        modals[i].classList.add('modal--hidden');
-      }
+      modals.forEach(function (modal) {
+        modal.classList.add('modal--hidden');
+      });
 
       removeEscHandler();
     },

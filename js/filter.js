@@ -158,6 +158,18 @@
       sortInputs: filterForm.querySelectorAll('input[name="sort"]:checked'),
     };
 
+    filterProps = {
+      foodTypes: [],
+      foodProps: [],
+      price: {
+        min: parseInt(rangePriceMinElem.textContent, 10),
+        max: parseInt(rangePriceMaxElem.textContent, 10),
+      },
+      favorite: null,
+      available: null,
+      sort: null,
+    };
+
     if (checkedInputs.foodTypeInputs.length) {
       checkedInputs.foodTypeInputs.forEach(function (elem) {
         filterProps.foodTypes.push(elem.id);
@@ -187,18 +199,6 @@
 
   window.applyFilter = window.debounce(function () {
     var filteredArray;
-
-    filterProps = {
-      foodTypes: [],
-      foodProps: [],
-      price: {
-        min: parseInt(rangePriceMinElem.textContent, 10),
-        max: parseInt(rangePriceMaxElem.textContent, 10),
-      },
-      favorite: null,
-      available: null,
-      sort: null,
-    };
 
     setFilterProps();
 

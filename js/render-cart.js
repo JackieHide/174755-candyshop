@@ -26,9 +26,9 @@
     var headerCart = document.querySelector('.main-header__basket');
     var cartTotal = 0;
 
-    for (var k = 0; k < window.basketItems.length; k++) {
-      cartTotal += window.basketItems[k].orderedAmount;
-    }
+    window.basketItems.forEach(function (basketItem) {
+      cartTotal += basketItem.orderedAmount;
+    });
 
     if (!cartTotal) {
       headerCart.textContent = 'В корзине ничего нет';
@@ -37,32 +37,47 @@
     }
   };
 
-  // Создание корзины
-  window.renderCart = function () {
+  // заполнение корзины
+  var fillCart = function (cartBlock) {
     var fragment = document.createDocumentFragment();
-    var cartBlock = document.querySelector('.goods__cards');
-    var cartElements = document.querySelectorAll('.goods_card');
 
-    window.setHeaderCartText();
-
-    for (var j = 0; j < cartElements.length; j++) {
-      cartElements[j].remove();
-    }
-
-    for (var i = 0; i < window.basketItems.length; i++) {
-      fragment.appendChild(renderOrderedGood(window.basketItems[i]));
-    }
+    window.basketItems.forEach(function (basketItem) {
+      fragment.appendChild(renderOrderedGood(basketItem));
+    });
 
     cartBlock.appendChild(fragment);
+  };
 
+  // очистка корзины
+  var clearCart = function () {
+    var cartElements = document.querySelectorAll('.goods_card');
+
+    cartElements.forEach(function (cartElement) {
+      cartElement.remove();
+    });
+  };
+
+  // смена состояния корзины
+  var toggleCartEmptyBlock = function (cartBlock) {
     if (window.basketItems.length) {
       cartBlock.classList.remove('goods__cards--empty');
       CART_BLOCK_EMPTY.classList.add('visually-hidden');
-      window.toggleForm();
     } else {
       cartBlock.classList.add('goods__cards--empty');
       CART_BLOCK_EMPTY.classList.remove('visually-hidden');
-      window.toggleForm();
     }
+  };
+
+  // Создание корзины
+  window.renderCart = function () {
+    var cartBlock = document.querySelector('.goods__cards');
+
+    window.setHeaderCartText();
+
+    clearCart();
+    fillCart(cartBlock);
+    toggleCartEmptyBlock(cartBlock);
+
+    window.toggleForm();
   };
 })();
