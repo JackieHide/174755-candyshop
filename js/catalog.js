@@ -4,8 +4,6 @@
   var basketItems = [];
   var cartIndexes = {};
 
-  window.basketItems = basketItems;
-
   var catalogList = document.querySelector('.catalog__cards');
   var cartList = document.querySelector('.goods__cards');
 
@@ -50,7 +48,7 @@
 
   var removeCartItem = function (goodID) {
     if (cartIndexes[goodID] !== undefined) {
-      window.goods[goodID].amount = window.goods[goodID].amount + basketItems[cartIndexes[goodID]].orderedAmount;
+      window.goods[goodID].amount += basketItems[cartIndexes[goodID]].orderedAmount;
 
       basketItems.splice(cartIndexes[goodID], 1);
 
@@ -150,4 +148,6 @@
 
   initFavorite();
   initCart();
+
+  window.basketItems = basketItems;
 })();

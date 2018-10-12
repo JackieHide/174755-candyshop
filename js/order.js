@@ -1,14 +1,27 @@
 'use strict';
 
 (function () {
+  var JPG_EXTENSION = '.jpg';
+
+  var CARD_MAX_LENGTH = 16;
+  var CARD_DATE_MAX_LENGTH = 4;
+  var CARD_DATE_DIVIDER_LENGTH = 3;
+
   var BACKSPACE_KEY = 8;
   var TAB_KEY = 9;
   var LEFT_KEY = 37;
   var RIGHT_KEY = 39;
 
+  var form = document.querySelector('.buy form');
+  var paymentInputs = form.querySelector('.payment__inputs');
+  var cardInput = document.querySelector('#payment__card-number');
+  var cardDateInput = document.querySelector('#payment__card-date');
+  var cardCvcInput = document.querySelector('#payment__card-cvc');
+  var cardHolderInput = document.querySelector('#payment__cardholder');
+  var cardStatusElement = form.querySelector('.payment__card-status');
+
   // Включение/выключение формы
-  window.toggleForm = function () {
-    var form = document.querySelector('.buy form');
+  var toggleForm = function () {
     var button = form.querySelector('button[type="submit"]');
     var inputs = form.querySelectorAll('input');
     var hiddenInputs = form.querySelectorAll('.visually-hidden input');
@@ -55,7 +68,7 @@
         currentParent.querySelector('.' + currentQuery + classAdd).classList.remove('visually-hidden');
       }
 
-      window.toggleForm();
+      toggleForm();
     };
 
     tabButtons.forEach(function (btn) {
@@ -64,13 +77,6 @@
   };
 
   // Проверка номера карты по алгоритму Луна, проверка нажатых клавиш
-
-  var form = document.querySelector('.buy form');
-  var paymentInputs = form.querySelector('.payment__inputs');
-  var cardInput = document.getElementById('payment__card-number');
-  var cardDateInput = document.getElementById('payment__card-date');
-  var cardCvcInput = document.getElementById('payment__card-cvc');
-  var cardHolderInput = document.getElementById('payment__cardholder');
 
   // Доставка товара по адресу из списка
   var initDeliver = function () {
@@ -82,7 +88,7 @@
       var currentInput = evt.target;
       var currentImg = currentInput.value;
 
-      imgElem.src = imgRoot + currentImg + '.jpg';
+      imgElem.src = imgRoot + currentImg + JPG_EXTENSION;
     };
 
     deliverListElem.addEventListener('change', onRadioInputChange);
@@ -103,14 +109,14 @@
   var maskDate = function (input, evt) {
     var value = cardDateInput.value.replace(/\D/g, '').slice(0, 10);
 
-    if (value.length >= 4 &&
+    if (value.length >= CARD_DATE_MAX_LENGTH &&
       evt.keyCode !== BACKSPACE_KEY &&
       evt.keyCode !== TAB_KEY &&
       evt.keyCode !== LEFT_KEY &&
       evt.keyCode !== RIGHT_KEY
     ) {
       evt.preventDefault();
-    } else if (value.length >= 3) {
+    } else if (value.length >= CARD_DATE_DIVIDER_LENGTH) {
       cardDateInput.value = value.slice(0, 2) + '/' + value.slice(2);
     }
   };
@@ -128,7 +134,7 @@
   var cardInputMask = function (evt) {
     allowNumbersOnly(evt);
 
-    if (cardInput.value.length >= 16 &&
+    if (cardInput.value.length >= CARD_MAX_LENGTH &&
       evt.keyCode !== BACKSPACE_KEY &&
       evt.keyCode !== TAB_KEY &&
       evt.keyCode !== LEFT_KEY &&
@@ -148,15 +154,12 @@
       cardInput.setCustomValidity('');
     }
 
-    if (cardInput.validity.valid &&
-        cardDateInput.validity.valid &&
-        cardCvcInput.validity.valid &&
-        cardHolderInput.validity.valid
-    ) {
-      form.querySelector('.payment__card-status').textContent = 'Одобрен';
-    } else {
-      form.querySelector('.payment__card-status').textContent = 'Не определен';
-    }
+    var isCardValid = cardInput.validity.valid &&
+                      cardDateInput.validity.valid &&
+                      cardCvcInput.validity.valid &&
+                      cardHolderInput.validity.valid;
+
+    cardStatusElement.textContent = isCardValid ? 'Одобрен' : 'Не определен';
   };
 
   var initForm = function () {
@@ -190,7 +193,9 @@
     });
   };
 
-  window.toggleForm();
+  toggleForm();
   initTabs();
   initForm();
+
+  window.toggleForm = toggleForm;
 })();

@@ -1,6 +1,8 @@
 'use strict';
 
 (function () {
+  var GOOD_STOCK_MIN_PARAM = 5;
+
   var goodsList = document.querySelector('.catalog__cards');
 
   // Создание карточки с мороженым
@@ -20,7 +22,7 @@
 
     goodCard.classList.remove('card--in-stock', 'card--little', 'card--soon');
 
-    if (good.amount > 5) {
+    if (good.amount > GOOD_STOCK_MIN_PARAM) {
       goodCard.classList.add('card--in-stock');
     } else if (good.amount < 1) {
       goodCard.classList.add('card--soon');

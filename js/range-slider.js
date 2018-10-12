@@ -9,16 +9,6 @@
   var rangePriceMax = document.querySelector('.range__price--max');
   var rangePriceMin = document.querySelector('.range__price--min');
 
-  window.rangeSliderSetDefault = function () {
-    rangePriceMin.textContent = window.util.RANGE_NUMBERS[0];
-    rangePriceMax.textContent = window.util.RANGE_NUMBERS[1];
-
-    rangeBtnLeft.style.left = '0px';
-    rangeBtnRight.style.left = rangeFilter.offsetWidth + 'px';
-    rangeLine.style.left = '0px';
-    rangeLine.style.right = '0px';
-  };
-
   var getPinPosition = function (pinElem, pinLeftOffset, shift) {
     var stopPosition = {
       min: 0,
@@ -142,6 +132,16 @@
   });
 
   rangeFilter.addEventListener('click', onRangeSliderClick);
+
+  window.rangeSliderSetDefault = function () {
+    rangePriceMin.textContent = window.util.RANGE_NUMBERS[0];
+    rangePriceMax.textContent = window.util.RANGE_NUMBERS[1];
+
+    rangeBtnLeft.style.left = '0px';
+    rangeBtnRight.style.left = rangeFilter.offsetWidth + 'px';
+    rangeLine.style.left = '0px';
+    rangeLine.style.right = '0px';
+  };
 
   window.rangeSliderSetDefault();
 })();

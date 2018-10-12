@@ -3,7 +3,7 @@
 (function () {
   var DEBOUNCE_INTERVAL = 500;
 
-  var kindsMap = {
+  var KindsMap = {
     'icecream': 'Мороженое',
     'marshmallows': 'Зефир',
     'soda': 'Газировка',
@@ -20,16 +20,10 @@
     'filter-price': filterForm.querySelector('.range__count'),
   };
 
-  document.querySelectorAll('.catalog__filter input').forEach(function (elem) {
-    if (elem.closest('.input-btn').querySelector('span')) {
-      countSpans[elem.id] = elem.closest('.input-btn').querySelector('span');
-    }
-  });
-
   var filterProps;
 
   var translateKind = function (value) {
-    return kindsMap[value];
+    return KindsMap[value];
   };
 
   // функции для фильтрации
@@ -256,6 +250,15 @@
 
     window.applyFilter();
   };
+
+  // заполнение countSpans
+  document.querySelectorAll('.catalog__filter input').forEach(function (elem) {
+    var currentValueSpan = elem.closest('.input-btn').querySelector('span');
+
+    if (currentValueSpan) {
+      countSpans[elem.id] = currentValueSpan;
+    }
+  });
 
   filterForm.addEventListener('change', onFilterFormChange);
   filterClearBtn.addEventListener('click', onFilterClearBtnClick);
