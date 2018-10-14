@@ -80,10 +80,12 @@
       var rank = 0;
 
       if (filterProps.foodTypes.length) {
-        filterProps.foodTypes.forEach(function (elem) {
+        filterProps.foodTypes.some(function (elem) {
           if (atomicFilterFunctions[elem](item)) {
             rank++;
           }
+
+          return !!rank;
         });
       } else {
         rank++;
@@ -133,7 +135,7 @@
       return left.price - right.price;
     },
     'filter-rating': function (left, right) {
-      return right.rating.value - left.rating.value;
+      return (right.rating.value - left.rating.value) || sortFunctions['filter-popular'](left, right);
     },
   };
 
@@ -197,12 +199,15 @@
     setFilterProps();
 
     // фильтрация
-    filteredArray = window.goods
-                      .filter(filterFunctions.filterByKind)
-                      .filter(filterFunctions.filterByProps)
-                      .filter(filterFunctions.filterByPrice)
-                      .filter(filterFunctions.filterByFavorite)
-                      .filter(filterFunctions.filterByAvailability);
+    filteredArray = window.goods.filter(function (item) {
+      return (
+        filterFunctions.filterByKind(item) &&
+        filterFunctions.filterByProps(item) &&
+        filterFunctions.filterByPrice(item) &&
+        filterFunctions.filterByFavorite(item) &&
+        filterFunctions.filterByAvailability(item)
+      );
+    });
 
     if (filterProps.sort) {
       filteredArray = filteredArray.sort(sortFunctions[filterProps.sort]);

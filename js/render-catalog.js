@@ -2,6 +2,8 @@
 
 (function () {
   var GOOD_STOCK_MIN_PARAM = 5;
+  var DEFAULT_TEMPLATE_STOCK_CLASS = 'card--in-stock';
+  var DEFAULT_TEMPLATE_RATING_CLASS = 'stars__rating--five';
 
   var goodsList = document.querySelector('.catalog__cards');
 
@@ -20,7 +22,7 @@
     var goodCartButton = goodCard.querySelector('.card__btn');
     var goodCartButtonFavorite = goodCard.querySelector('.card__btn-favorite');
 
-    goodCard.classList.remove('card--in-stock', 'card--little', 'card--soon');
+    goodCard.classList.remove(DEFAULT_TEMPLATE_STOCK_CLASS);
 
     if (good.amount > GOOD_STOCK_MIN_PARAM) {
       goodCard.classList.add('card--in-stock');
@@ -38,7 +40,7 @@
     goodPrice.childNodes[0].textContent = good.price + ' ';
     goodPrice.childNodes[2].textContent = '/ ' + good.weight + ' г';
 
-    goodStarsRating.classList.remove('stars__rating--one', 'stars__rating--two', 'stars__rating--three', 'stars__rating--four', 'stars__rating--five');
+    goodStarsRating.classList.remove(DEFAULT_TEMPLATE_RATING_CLASS);
     goodStarsRating.classList.add(window.util.getRatingClass(good.rating.value));
 
     goodStarCount.textContent = '(' + good.rating.number + ')';

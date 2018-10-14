@@ -13,6 +13,9 @@
   var RIGHT_KEY = 39;
 
   var form = document.querySelector('.buy form');
+  var formButton = form.querySelector('button[type="submit"]');
+  var formInputs = form.querySelectorAll('input');
+
   var paymentInputs = form.querySelector('.payment__inputs');
   var cardInput = document.querySelector('#payment__card-number');
   var cardDateInput = document.querySelector('#payment__card-date');
@@ -20,15 +23,22 @@
   var cardHolderInput = document.querySelector('#payment__cardholder');
   var cardStatusElement = form.querySelector('.payment__card-status');
 
+  var isSpecialKeyPressed = function (evt) {
+    return (
+      evt.keyCode === BACKSPACE_KEY ||
+      evt.keyCode === TAB_KEY ||
+      evt.keyCode === LEFT_KEY ||
+      evt.keyCode === RIGHT_KEY
+    );
+  };
+
   // Включение/выключение формы
   var toggleForm = function () {
-    var button = form.querySelector('button[type="submit"]');
-    var inputs = form.querySelectorAll('input');
     var hiddenInputs = form.querySelectorAll('.visually-hidden input');
     var fieldSets = form.querySelectorAll('fieldset');
     var disabledState = window.basketItems ? window.basketItems.length === 0 : true;
 
-    inputs.forEach(function (input) {
+    formInputs.forEach(function (input) {
       input.disabled = disabledState;
     });
 
@@ -40,7 +50,7 @@
       hiddenInput.disabled = true;
     });
 
-    button.disabled = disabledState;
+    formButton.disabled = disabledState;
   };
 
   // Переключение вкладок в форме оформления заказа
@@ -95,26 +105,20 @@
   };
 
   var clearForm = function () {
-    var inputs = form.querySelectorAll('input');
-    var cardStatus = form.querySelector('.payment__card-status');
+    var clearableInputs = form.querySelectorAll('input:not([type="radio"]):not(.card-order__count)');
 
-    inputs.forEach(function (input) {
+    clearableInputs.forEach(function (input) {
       input.value = '';
     });
 
-    cardStatus.textContent = 'Не определён';
+    cardStatusElement.textContent = 'Не определён';
   };
 
   // Добавление слэша в дату карты
   var maskDate = function (input, evt) {
     var value = cardDateInput.value.replace(/\D/g, '').slice(0, 10);
 
-    if (value.length >= CARD_DATE_MAX_LENGTH &&
-      evt.keyCode !== BACKSPACE_KEY &&
-      evt.keyCode !== TAB_KEY &&
-      evt.keyCode !== LEFT_KEY &&
-      evt.keyCode !== RIGHT_KEY
-    ) {
+    if (value.length >= CARD_DATE_MAX_LENGTH && !isSpecialKeyPressed(evt)) {
       evt.preventDefault();
     } else if (value.length >= CARD_DATE_DIVIDER_LENGTH) {
       cardDateInput.value = value.slice(0, 2) + '/' + value.slice(2);
@@ -134,12 +138,7 @@
   var cardInputMask = function (evt) {
     allowNumbersOnly(evt);
 
-    if (cardInput.value.length >= CARD_MAX_LENGTH &&
-      evt.keyCode !== BACKSPACE_KEY &&
-      evt.keyCode !== TAB_KEY &&
-      evt.keyCode !== LEFT_KEY &&
-      evt.keyCode !== RIGHT_KEY
-    ) {
+    if (cardInput.value.length >= CARD_MAX_LENGTH && !isSpecialKeyPressed(evt)) {
       evt.preventDefault();
     }
   };
@@ -148,10 +147,16 @@
   var validateCard = function () {
     var cardNumber = cardInput.value.replace(/\s/g, '').trim();
 
-    if (!window.util.checkLuhn(cardNumber)) {
+    if (!window.util.checkLuhn(cardNumber) || cardInput.value.length < CARD_MAX_LENGTH) {
       cardInput.setCustomValidity('Введенная карта невалидна');
     } else {
       cardInput.setCustomValidity('');
+    }
+
+    if (cardDateInput.value.replace(/\D/g, '').length < CARD_DATE_MAX_LENGTH) {
+      cardDateInput.setCustomValidity('Введенная дата невалидна');
+    } else {
+      cardDateInput.setCustomValidity('');
     }
 
     var isCardValid = cardInput.validity.valid &&
@@ -163,6 +168,10 @@
   };
 
   var initForm = function () {
+    var onPaymentInputsKeyUp;
+    var onPaymentInputsKeyDown;
+    var onPaymentInputsKeyPress;
+
     var formSuccessHandler = function () {
       clearForm();
       window.modals.showSuccessModal();
@@ -180,9 +189,13 @@
       validateCard();
     };
 
-    paymentInputs.addEventListener('keyup', onPaymentInputsChange);
-    paymentInputs.addEventListener('keydown', onPaymentInputsChange);
-    paymentInputs.addEventListener('keypress', onPaymentInputsChange);
+    onPaymentInputsKeyUp = onPaymentInputsChange;
+    onPaymentInputsKeyDown = onPaymentInputsChange;
+    onPaymentInputsKeyPress = onPaymentInputsChange;
+
+    paymentInputs.addEventListener('keyup', onPaymentInputsKeyUp);
+    paymentInputs.addEventListener('keydown', onPaymentInputsKeyDown);
+    paymentInputs.addEventListener('keypress', onPaymentInputsKeyPress);
     paymentInputs.addEventListener('change', onPaymentInputsChange);
 
     initDeliver();
