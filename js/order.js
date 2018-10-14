@@ -7,10 +7,8 @@
   var CARD_DATE_MAX_LENGTH = 4;
   var CARD_DATE_DIVIDER_LENGTH = 3;
 
-  var BACKSPACE_KEY = 8;
-  var TAB_KEY = 9;
-  var LEFT_KEY = 37;
-  var RIGHT_KEY = 39;
+  // backspace, tab, left, right
+  var SPECIAL_KEY_CODES = [8, 9, 37, 39];
 
   var form = document.querySelector('.buy form');
   var formButton = form.querySelector('button[type="submit"]');
@@ -24,12 +22,7 @@
   var cardStatusElement = form.querySelector('.payment__card-status');
 
   var isSpecialKeyPressed = function (evt) {
-    return (
-      evt.keyCode === BACKSPACE_KEY ||
-      evt.keyCode === TAB_KEY ||
-      evt.keyCode === LEFT_KEY ||
-      evt.keyCode === RIGHT_KEY
-    );
+    return SPECIAL_KEY_CODES.indexOf(evt.keyCode) !== -1;
   };
 
   // Включение/выключение формы

@@ -77,21 +77,13 @@
 
   var filterFunctions = {
     filterByKind: function (item) {
-      var rank = 0;
-
-      if (filterProps.foodTypes.length) {
-        filterProps.foodTypes.some(function (elem) {
-          if (atomicFilterFunctions[elem](item)) {
-            rank++;
-          }
-
-          return !!rank;
-        });
-      } else {
-        rank++;
+      if (!filterProps.foodTypes.length) {
+        return true;
       }
 
-      return !!rank;
+      return filterProps.foodTypes.some(function (elem) {
+        return atomicFilterFunctions[elem](item);
+      });
     },
 
     filterByProps: function (item) {
@@ -99,11 +91,9 @@
       var propsLength = filterProps.foodProps.length;
 
       if (propsLength) {
-        filterProps.foodProps.forEach(function (elem) {
-          if (atomicFilterFunctions[elem](item)) {
-            rank++;
-          }
-        });
+        rank = filterProps.foodProps.filter(function (elem) {
+          return atomicFilterFunctions[elem](item);
+        }).length;
 
         rank = rank === propsLength;
       } else {
@@ -151,7 +141,7 @@
       foodPropInputs: filterForm.querySelectorAll('input[name="food-property"]:checked'),
       favoriteInput: filterForm.querySelector('#filter-favorite:checked'),
       availabilityInput: filterForm.querySelector('#filter-availability:checked'),
-      sortInputs: filterForm.querySelectorAll('input[name="sort"]:checked'),
+      sortInput: filterForm.querySelector('input[name="sort"]:checked'),
     };
 
     filterProps = {
@@ -161,34 +151,20 @@
         min: parseInt(rangePriceMinElem.textContent, 10),
         max: parseInt(rangePriceMaxElem.textContent, 10),
       },
-      favorite: null,
-      available: null,
-      sort: null,
+      favorite: !!checkedInputs.favoriteInput,
+      available: !!checkedInputs.availabilityInput,
+      sort: checkedInputs.sortInput ? checkedInputs.sortInput.id : null,
     };
 
     if (checkedInputs.foodTypeInputs.length) {
-      checkedInputs.foodTypeInputs.forEach(function (elem) {
-        filterProps.foodTypes.push(elem.id);
+      filterProps.foodTypes = Array.prototype.slice.call(checkedInputs.foodTypeInputs).map(function (elem) {
+        return elem.id;
       });
     }
 
     if (checkedInputs.foodPropInputs.length) {
-      checkedInputs.foodPropInputs.forEach(function (elem) {
-        filterProps.foodProps.push(elem.id);
-      });
-    }
-
-    if (checkedInputs.favoriteInput) {
-      filterProps.favorite = true;
-    }
-
-    if (checkedInputs.availabilityInput) {
-      filterProps.available = true;
-    }
-
-    if (checkedInputs.sortInputs.length) {
-      checkedInputs.sortInputs.forEach(function (elem) {
-        filterProps.sort = elem.id;
+      filterProps.foodProps = Array.prototype.slice.call(checkedInputs.foodPropInputs).map(function (elem) {
+        return elem.id;
       });
     }
   };
